@@ -48,46 +48,57 @@ class BPETokenizer:
     def encode(self, text):
         """
         Convert text into token IDs.
-        """
 
+        Unknown characters (not seen during training) are silently skipped
+        rather than raising a KeyError, which would crash generation on any
+        punctuation or casing the tokenizer hasn't seen.
+        """
         token_ids = []
 
-        words = text.split()
-
-        for word in words:
-
+        for word in text.split():
             symbols = list(word) + ["</w>"]
 
             for pair in self.merges:
                 symbols = self._merge_symbols(symbols, pair)
 
             for symbol in symbols:
-                token_ids.append(self.stoi[symbol])
+                if symbol in self.stoi:
+                    token_ids.append(self.stoi[symbol])
+                # silently skip unknown symbols
 
         return token_ids
 
     def decode(self, ids):
         """
         Convert token IDs back into text.
-        """
 
-        words = []
+        After BPE training, tokens are often fully-merged strings that
+        already contain </w> — e.g. "the</w>", "and</w>", "h".
+        We can't check `symbol == "</w>"` because the marker is usually
+        embedded inside a larger token, not emitted as its own token.
+
+        The correct approach:
+          - Strip </w> from the end of every symbol — that marks a word boundary
+          - Accumulate sub-word fragments into the current word
+          - Flush the word to the list whenever we hit a </w>-terminated token
+        """
+        words        = []
         current_word = ""
 
         for idx in ids:
+            symbol = self.itos.get(idx, "")
 
-            symbol = self.itos[idx]
-
-            if symbol == "</w>":
-
-                words.append(current_word)
+            if symbol.endswith("</w>"):
+                # This token completes a word — strip the marker and flush
+                current_word += symbol[:-len("</w>")]
+                if current_word:
+                    words.append(current_word)
                 current_word = ""
-
             else:
-
+                # Sub-word fragment — keep accumulating
                 current_word += symbol
 
-        # Handle incomplete final word
+        # Flush any trailing fragment (incomplete word at end of sequence)
         if current_word:
             words.append(current_word)
 
