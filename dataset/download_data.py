@@ -40,7 +40,7 @@ def download_wikitext():
     os.makedirs(str(WIKITEXT_DIR), exist_ok=True)
 
     # 'wikitext-103-v1' is the standard benchmark split
-    dataset = load_dataset("wikitext", "wikitext-103-v1", trust_remote_code=True)
+    dataset = load_dataset("wikitext", "wikitext-103-v1")
 
     for split in ("train", "validation", "test"):
         out_path = str(WIKITEXT_DIR / f"{split}.txt")
@@ -94,7 +94,7 @@ def download_dailydialog():
     print("Downloading DailyDialog …")
     os.makedirs(str(DAILYDIALOG_DIR), exist_ok=True)
 
-    dataset = load_dataset("daily_dialog", trust_remote_code=True)
+    dataset = load_dataset("daily_dialog")
 
     for split in ("train", "validation", "test"):
         out_path = str(DAILYDIALOG_DIR / f"{split}.jsonl")
