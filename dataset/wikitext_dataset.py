@@ -138,11 +138,22 @@ class WikiTextDataset(Dataset):
 # Convenience factory
 # ---------------------------------------------------------------------------
 
+def _ensure_downloaded():
+    """Download WikiText-103 if the text files aren't present yet."""
+    train_path = WIKITEXT_DIR / "train.txt"
+    if not train_path.exists():
+        print("  WikiText-103 not found — downloading now …")
+        from dataset.download_data import download_wikitext
+        download_wikitext()
+
+
 def make_wikitext_datasets(block_size: int):
     """
     Load tokenizer once and return (train_dataset, val_dataset).
     Call this from pretrain.py — don't instantiate WikiTextDataset directly.
     """
+    _ensure_downloaded()
+
     print("Loading GPT-2 tokenizer …")
     tokenizer = load_gpt2_tokenizer()
     vocab_size = tokenizer.get_vocab_size()

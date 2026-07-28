@@ -192,11 +192,22 @@ class DialogDataset(Dataset):
 # Convenience factory
 # ---------------------------------------------------------------------------
 
+def _ensure_downloaded():
+    """Download DailyDialog if the JSONL files aren't present yet."""
+    train_path = DAILYDIALOG_DIR / "train.jsonl"
+    if not train_path.exists():
+        print("  DailyDialog not found — downloading now …")
+        from dataset.download_data import download_dailydialog
+        download_dailydialog()
+
+
 def make_dialog_datasets(block_size: int):
     """
     Returns (train_dataset, val_dataset, vocab_size).
     Call this from finetune.py.
     """
+    _ensure_downloaded()
+
     print("Loading dialog tokenizer …")
     tokenizer, vocab_size = load_dialog_tokenizer()
 
