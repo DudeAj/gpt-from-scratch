@@ -46,3 +46,19 @@ first + → residual connection
 ln_2 → normalize again
 mlp → Linear → GELU → Linear
 second + → residual connection
+
+
+
+#running steps
+
+# 1. Download WikiText-103 + DailyDialog (~500MB total, one-time)
+python -m dataset.download_data
+
+# 2. Pretrain on WikiText-103 (~12 min on M3 MPS)
+python -m training.pretrain
+
+# 3. Fine-tune on DailyDialog (~10 min on M3 MPS)
+python -m training.finetune
+
+# 4. Chat
+python -m inference.chat
