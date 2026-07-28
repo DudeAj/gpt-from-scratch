@@ -1,0 +1,48 @@
+Creating folders and configuration files is effectively O(1) with respect to model size.
+
+The computationally expensive work begins when we process tensors:
+
+Embedding lookup: approximately O(B × T × d)
+Feed-forward network: approximately O(B × T × d²) (depending on hidden dimension)
+Self-attention: approximately O(B × T² × d)
+
+where:
+
+B = batch size
+T = sequence length (context length)
+d = embedding dimension
+
+
+Computational Complexity
+
+Suppose:
+
+T = number of tokens
+
+Encoding performs a dictionary lookup for each token.
+
+Average-case complexity:
+
+O(T)
+
+Space complexity:
+
+O(T)
+
+The tokenizer is inexpensive compared with the transformer itself, whose attention mechanism scales roughly as O(T
+2
+).
+
+
+Layer Norm 
+Large activations make optimization unstable.
+
+We want every token representation to stay in a healthy numerical range.
+
+Transformer Block
+ln_1 → normalize across the embedding dimension
+attn → Q, K, V → attention scores → masking → softmax → weighted sum → output projection
+first + → residual connection
+ln_2 → normalize again
+mlp → Linear → GELU → Linear
+second + → residual connection
