@@ -94,7 +94,7 @@ def download_dailydialog():
     print("Downloading DailyDialog …")
     os.makedirs(str(DAILYDIALOG_DIR), exist_ok=True)
 
-    dataset = load_dataset("daily_dialog")
+    dataset = load_dataset("DeepPavlov/daily_dialog")
 
     for split in ("train", "validation", "test"):
         out_path = str(DAILYDIALOG_DIR / f"{split}.jsonl")
